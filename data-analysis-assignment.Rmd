@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 In this document, we will be working on Data Analysis Assignment for BUS4028. This report performs data analysis using R programming on a climate change dataset. The analysis includes data manipulation, statistical functions, and plotting.
+The code is also published on GitHub [HERE](https://github.com/musaabshirgar1/Data-Analysis-Using-R). 
 
 ## Data Loading
 
