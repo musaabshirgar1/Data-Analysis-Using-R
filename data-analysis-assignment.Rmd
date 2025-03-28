@@ -1,0 +1,186 @@
+---
+title: "Data Analysis using R Programming - BUS4028"
+author: "Group 08"
+date: "2025-03-28"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+In this document, we will be working on Data Analysis Assignment for BUS4028. This report performs data analysis using R programming on a climate change dataset. The analysis includes data manipulation, statistical functions, and plotting.
+
+## Data Loading
+
+### Read CSV file climate_change_indicators.csv
+```{r}
+df <- read.csv("climate_change_indicators.csv")
+```
+
+## Data Exploration
+
+### Print structure of df
+```{r}
+str(df)
+```
+
+### List variables in dataset
+```{r}
+ls(df)
+```
+
+### Print Top 15 Rows of Dataset
+```{r}
+head(df, 15)
+```
+
+## User-Defined Function
+
+### Create a User Defined Function
+```{r}
+celsius_to_fahreheit <- function(temp) { return ((temp * 9/5) + 32)}
+df$F2022_Fahrenheit <- celsius_to_fahreheit(df$F2022)
+print(df$F2022_Fahrenheit)
+```
+
+## Data Manipulation
+
+### Filtering Rows using subset() where Country = Canada
+```{r}
+canada_df <- subset(df, ISO3 == "CAN")
+head(canada_df)
+```
+
+### Identify dependent and Independent Variables and Reshape the data
+```{r}
+#selected two columns for reshaping i.e. Country and F2022
+selected_data <- df[, c("Country", "F2022")]
+library(reshape2)
+melted_data <- melt(selected_data, id.vars = "Country",
+                    variable.name = "Year", value.name = "TemperatureChange")
+print(melted_data)
+```
+
+### Remove Missing Values from Data Frame
+```{r}
+df <- na.omit(df)
+```
+
+### Identify and Remove Duplicated Data
+```{r}
+#identify duplicate rows
+duplicate_rows <- duplicated(df)
+print("Duplicate Rows:")
+print(duplicate_rows)
+
+#Remove duplicate rows
+unique_df <- unique(df)
+print("DataFrame after removing duplicates:")
+print(unique_df)
+```
+
+### Reorder Multiple Rows in Descending Order
+```{r}
+ordered_df <- df[order(df$Country, -df$F2022), ]
+print("Ordered by Country, then F2022 (descending):")
+head(ordered_df)
+```
+
+### Renaming Columns
+```{r}
+colnames(df)[colnames(df) == "F2022"] <- "Temperature_2022"
+colnames(df)[colnames(df) == "F2021"] <- "Temperature_2021"
+ls(df)
+```
+
+### Adding New Variables
+```{r}
+#adding new column F2022_x_2 which is F2022 multiplied by 2
+df$F2022_x_2 <- df$Temperature_2022 * 2
+ls(df)
+```
+
+### Creating a Training Set
+```{r}
+#setting seed for reproducibility
+set.seed(123)
+#creating a vector of random numbers
+train_index <- sample(seq_len(nrow(df)), 0.8 * nrow(df))
+#create training set
+train_set <- df[train_index, ]
+#display top 15 rows of train dataset
+head(train_set, 15)
+```
+
+## Summary Statistics and Statistical Functions
+
+### Summary Statistics
+```{r}
+print(summary(df))
+```
+
+### Statistical Functions
+```{r}
+#Mean of F2022
+mean_F2022 <- mean(df$Temperature_2022) # nolint
+print(paste("Mean of Temperature_2022:", mean_F2022))
+
+#Median of F2022
+median_F2022 <- median(df$Temperature_2022) # nolint
+print(paste("Median of Temperature_2022:", median_F2022))
+
+#Mode of F2022
+get_mode <- function(v) {
+  unique_val <- unique(v)
+  unique_val[which.max(tabulate(match(v, unique_val)))]
+}
+mode_F2022 <- get_mode(df$Temperature_2022) # nolint
+print(paste("Mode of Temperature_2022:", mode_F2022))
+
+#Range of F2022
+range_F2022 <- range(df$Temperature_2022) # nolint
+print(paste("Range of Temperature_2022:", range_F2022))
+```
+
+# Plots and Correlation
+
+### Scatter Plot
+```{r}
+plot(df$Temperature_2021, df$Temperature_2022,
+     main = "Scatter Plot of Temperature_2021 vs Temperature 2022",
+     xlab = "Temperature_2021", ylab = "Temperature_2022")
+```
+
+### Bar Plot
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Getting the top 10 countries by Temperature_2022
+top_10_countries <- df %>%
+  arrange(desc(Temperature_2022)) %>%
+  head(10)
+
+# Creating the bar plot with only the top 10
+ggplot(top_10_countries, aes(x = factor(Country, levels = Country),
+                             y = Temperature_2022)) + 
+  geom_bar(stat = "identity") +
+  labs(title = "Top 10 Countries by Temperature_2022",
+       x = "Country",
+       y = "Temperature_2022") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(size = 14, face = "bold"),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"))
+```
+
+### Correlation
+```{r}
+correlation_F2021_F2022 <- cor(df$Temperature_2021, df$Temperature_2022) # nolint
+print(paste("Correlation between Temperature_2021 and Temperature_2022:",
+            correlation_F2021_F2022))
+```
