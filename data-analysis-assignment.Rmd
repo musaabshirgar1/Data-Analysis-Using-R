@@ -181,7 +181,7 @@ ggplot(top_10_countries, aes(x = factor(Country, levels = Country),
 
 ### Correlation
 ```{r}
-correlation_F2021_F2022 <- cor(df$Temperature_2021, df$Temperature_2022) # nolint
+correlation_F2021_F2022 <- cor(df$Temperature_2021, df$Temperature_2022, use = "complete.obs") # nolint
 print(paste("Correlation between Temperature_2021 and Temperature_2022:",
             correlation_F2021_F2022))
 ```
